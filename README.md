@@ -9,7 +9,7 @@ A Streamlit web app that demonstrates a **self-validating protein design pipelin
 
 ## 🚀 Live Demo
 
-https://proteinmpnn-esmfold-app-lwyo4735xvzefccepyphqf.streamlit.app/
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://proteinmpnn-esmfold-app-lwyo4735xvzefccepyphqf.streamlit.app/)
 ## 📦 Quick Start (Local)
 
 ```bash
