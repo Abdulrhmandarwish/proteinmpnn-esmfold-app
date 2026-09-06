@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp files
+*.tmp
+*.bak
+
+# PyMOL output (generated at runtime)
+output/
+*.pse
+
+# Test outputs
+run_pipeline_test.py
+
+# Streamlit
+.streamlit/secrets.toml
+
+# HuggingFace cache
+.cache/
+
+# Licenses (local only)
+.licenses/
