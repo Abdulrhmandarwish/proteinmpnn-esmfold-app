@@ -84,21 +84,39 @@ pdb_string_input = st.session_state.pdb_string
 input_source = st.session_state.input_source
 
 if pdb_string_input is not None:
-    # Single-chain check
-    chains = set()
-    for line in pdb_string_input.split('\n'):
-        if line.startswith("ATOM") and len(line) > 21:
-            chains.add(line[21])
-    if len(chains) > 1:
-        st.error(f"Multiple chains: {sorted(chains)}. Only single-chain PDBs supported.")
+    # ── Chain Selection & Filtering ──────────────────────────────────────
+    chains = sorted(list(set(
+        line[21] for line in pdb_string_input.split('\n')
+        if (line.startswith("ATOM") or line.startswith("HETATM")) and len(line) > 21
+    )))
+
+    if not chains:
+        st.error("No valid chains found in the PDB file.")
         st.stop()
 
-    st.success(f"✅ Loaded **{input_source}**")
+    selected_chain = chains[0]
+    if len(chains) > 1:
+        st.warning(f"Multiple chains detected: {chains}")
+        selected_chain = st.selectbox("Select which chain to design:", chains)
+
+    # Filter the PDB string to ONLY include the selected chain
+    filtered_lines = []
+    for line in pdb_string_input.split('\n'):
+        if line.startswith("ATOM") or line.startswith("HETATM"):
+            if len(line) > 21 and line[21] == selected_chain:
+                filtered_lines.append(line)
+        else:
+            # Keep headers, TER, END lines
+            filtered_lines.append(line)
+    
+    active_pdb_string = '\n'.join(filtered_lines)
+
+    st.success(f"✅ Loaded **{input_source}** — Designing Chain **{selected_chain}**")
 
     # ── Run Pipeline button ──────────────────────────────────────────────
     if st.button("🚀 Run Pipeline", type="primary"):
         tmp_orig = tempfile.NamedTemporaryFile(delete=False, suffix=".pdb")
-        tmp_orig.write(pdb_string_input.encode("utf-8"))
+        tmp_orig.write(active_pdb_string.encode("utf-8"))
         tmp_orig.close()
 
         try:
@@ -189,7 +207,7 @@ if pdb_string_input is not None:
         st.subheader("🏗️ Structural Alignment")
         st.caption("Blue = Original backbone  •  Orange = Predicted from designed sequence")
         view_align = render_alignment_overlay(
-            pdb_string_input, predicted_pdb,
+            active_pdb_string, predicted_pdb,
             r["u"], r["t"],
             width=800, height=500
         )
